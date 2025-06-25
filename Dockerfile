@@ -3,7 +3,7 @@ ENV PROFILE=cloud
 VOLUME /tmp
 
 COPY target/app.jar /app.jar
-ADD configs /configs
+ADD config /config
 ADD keys /.ssh
 RUN chmod 400 /.ssh/hetz_id
 

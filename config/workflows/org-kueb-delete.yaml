@@ -1,0 +1,10 @@
+name: org-kueb-delete
+description: Delete kueb entity
+args:
+  host: required
+  org: required
+  name: required
+run:
+- ssh:
+    host: $.args.host
+    command: with lxc delete kueb --org $.args.org --name $.args.name

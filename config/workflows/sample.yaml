@@ -1,0 +1,17 @@
+name: sample
+description: A sample workflow
+args:
+  name: required
+run:
+- sql/get:
+    select: name,method from workflow.definition where name = 'sample'
+  as: definition
+- log:
+    message: Hello $.args.name
+- log:
+    message: First is $.definition.name and method is $.definition.method
+- sql/save:
+    insert:
+      name: $.args.name
+      method: $.definition.method
+    into: workflow.test

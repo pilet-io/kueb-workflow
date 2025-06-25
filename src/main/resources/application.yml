@@ -1,0 +1,13 @@
+spring:
+  jackson:
+    default-property-inclusion: non_null
+  profiles:
+    active: dev
+  application:
+    name: kueb-worklfow
+
+otel:
+  exporter:
+    otlp:
+      protocol: http/protobuf
+      endpoint: http://otel-system.kueb.io

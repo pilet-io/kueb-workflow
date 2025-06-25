@@ -1,0 +1,9 @@
+name: host
+description: Host testing workflow
+run:
+- sql/list:
+    select: host from system.host
+- random:
+    from: $.sql_list
+- log:
+    message: Host is $.random.host

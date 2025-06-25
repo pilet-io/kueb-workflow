@@ -1,13 +1,15 @@
-package io.pilet.kueb.worklfow;
+package io.pilet.kueb.workflow;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.kafka.annotation.EnableKafka;
 
 @SpringBootApplication
-public class KuebWorklfowApplication {
+@EnableKafka
+public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(KuebWorklfowApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
 }

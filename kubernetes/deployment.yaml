@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: dockersec
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: eyJhdXRocyI6eyJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOnsidXNlcm5hbWUiOiJwaWxldCIsInBhc3N3b3JkIjoiZGNrcl9wYXRfQW1mMW0ySTd0N0c1QlJrdUI2UTFNZDBoQ0RRIiwiZW1haWwiOiJwb3RhcG92QHlhaG9vLmNvbSIsImF1dGgiOiJjR2xzWlhRNlpHTnJjbDl3WVhSZlFXMW1NVzB5U1RkME4wYzFRbEpyZFVJMlVURk5aREJvUTBSUiJ9fX0=
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uno-store
+  labels:
+    app: uno-store
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uno-store
+  template:
+    metadata:
+      labels:
+        app: uno-store
+    spec:
+      imagePullSecrets:
+        - name: dockersec
+      containers:
+        - name: uno-store
+          image: pilet/uno-store:${POM_VERSION}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: uno-store
+spec:
+  type: ClusterIP
+  ports:
+    - name: rest
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: uno-store
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: uno-store
+spec:
+  rules:
+    - http:
+        paths:
+          - path: "/v1/store"
+            pathType: Prefix
+            backend:
+              service:
+                name: uno-store
+                port:
+                  number: 8080
+          - path: "/v1/streams"
+            pathType: Prefix
+            backend:
+              service:
+                name: uno-store
+                port:
+                  number: 8080
+          - path: "/v1/iam"
+            pathType: Prefix
+            backend:
+              service:
+                name: uno-store
+                port:
+                  number: 8080

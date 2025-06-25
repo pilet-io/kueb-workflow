@@ -1,10 +1,10 @@
-package io.pilet.kueb.worklfow;
+package io.pilet.kueb.workflow;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class KuebWorklfowApplicationTests {
+class ApplicationTests {
 
     @Test
     void contextLoads() {

@@ -10,7 +10,7 @@
     </parent>
     <groupId>io.pilet</groupId>
     <artifactId>kueb-worklfow</artifactId>
-    <version>1.0.3</version>
+    <version>1.0.4</version>
     <name>kueb-worklfow</name>
     <description>kueb-worklfow</description>
     <url/>

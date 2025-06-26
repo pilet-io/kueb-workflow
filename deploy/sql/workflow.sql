@@ -1,4 +1,4 @@
-DROP SCHEMA IF EXISTS workflow CASCADE;
+-- DROP SCHEMA IF EXISTS workflow CASCADE;
 CREATE SCHEMA IF NOT EXISTS workflow;
 
 CREATE TABLE IF NOT EXISTS workflow.definition (
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS workflow.step (
 );
 CREATE INDEX IF NOT EXISTS idx_step_trace ON workflow.step (trace);
 
-CREATE FUNCTION workflow.trigger_step()
+CREATE OR REPLACE FUNCTION workflow.trigger_step()
     RETURNS trigger AS $$
 BEGIN
     UPDATE workflow.run SET status = NEW.status, updated = NEW.created WHERE trace = NEW.trace;

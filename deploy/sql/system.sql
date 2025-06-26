@@ -1,4 +1,4 @@
-DROP SCHEMA IF EXISTS system CASCADE;
+-- DROP SCHEMA IF EXISTS system CASCADE;
 CREATE SCHEMA IF NOT EXISTS system;
 
 CREATE TABLE IF NOT EXISTS system.host (
@@ -12,7 +12,8 @@ INSERT INTO system.host (host, cpu, ram, disk)
     VALUES ('fs01.kueb.io', 32, 128, 3000),
            ('fs02.kueb.io', 32, 128, 3000),
            ('fs03.kueb.io', 32, 128, 3000),
-           ('fs04.kueb.io', 32, 128, 3000);
+           ('fs04.kueb.io', 32, 128, 3000)
+ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS system.settings (
     key TEXT PRIMARY KEY,
@@ -21,4 +22,5 @@ CREATE TABLE IF NOT EXISTS system.settings (
 );
 
 INSERT INTO system.settings (key, category, value)
-    VALUES ('fs_root', 'system', '/');
+    VALUES ('fs_root', 'system', '/')
+ON CONFLICT DO NOTHING;

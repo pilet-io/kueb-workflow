@@ -11,3 +11,4 @@ otel:
     otlp:
       protocol: http/protobuf
       endpoint: http://otel-system.kueb.io
+

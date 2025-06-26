@@ -1,10 +1,10 @@
-DROP SCHEMA IF EXISTS iam CASCADE;
+-- DROP SCHEMA IF EXISTS iam CASCADE;
 CREATE SCHEMA IF NOT EXISTS iam;
 
 CREATE TABLE IF NOT EXISTS iam.role (
     role TEXT PRIMARY KEY
 );
-INSERT INTO iam.role (role) VALUES ('power_user'), ('ui_user');
+INSERT INTO iam.role (role) VALUES ('power_user'), ('ui_user') ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS iam.permissions (
     url TEXT,
@@ -16,12 +16,12 @@ INSERT INTO iam.permissions (url, role, permissions)
 VALUES ('/v1/entity/kuebs', 'power_user', '{GET,POST,PUT,DELETE}'),
        ('/v1/workflow/definitions', 'power_user', '{GET,POST,PUT,DELETE}'),
        ('/v1/workflow/runs', 'power_user', '{GET,POST,PUT,DELETE}'),
-       ('/v1/iam/users', 'ui_user', '{GET}');
+       ('/v1/iam/users', 'ui_user', '{GET}') ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS iam.org (
     org TEXT PRIMARY KEY
 );
-INSERT INTO iam.org (org) VALUES ('pilet'), ('system');
+INSERT INTO iam.org (org) VALUES ('pilet'), ('system') ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS iam.users (
     email TEXT PRIMARY KEY,
@@ -31,7 +31,8 @@ CREATE TABLE IF NOT EXISTS iam.users (
 );
 INSERT INTO iam.users (email, name, org, token)
 VALUES ('alex.potapov.ru@gmail.com', 'Alex Potapov', 'pilet', '00d5daac356949049dc84d174d9fd20d'),
-       ('admin@pilet.io', 'Alex Potapov', 'system', '54b53072540eeeb8f8e9343e71f28176');
+       ('admin@pilet.io', 'Alex Potapov', 'system', '54b53072540eeeb8f8e9343e71f28176')
+ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS iam.user_roles (
     email TEXT REFERENCES iam.users,
@@ -40,7 +41,8 @@ CREATE TABLE IF NOT EXISTS iam.user_roles (
 );
 INSERT INTO iam.user_roles (email, role)
 VALUES ('alex.potapov.ru@gmail.com', 'power_user'),
-       ('admin@pilet.io', 'ui_user');
+       ('admin@pilet.io', 'ui_user')
+ON CONFLICT DO NOTHING;
 
 CREATE OR REPLACE VIEW iam.token_url AS
     SELECT token,url,permissions FROM iam.users u

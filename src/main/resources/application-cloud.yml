@@ -5,3 +5,7 @@ spring:
     password: par0l2010
   kafka:
     bootstrap-servers: kafka-service.kafka:9092
+
+app:
+  configPath: config
+  sqlPath: sql

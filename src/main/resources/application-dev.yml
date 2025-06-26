@@ -5,3 +5,7 @@ spring:
     password: postgres
   kafka:
     bootstrap-servers: localhost:29092
+
+app:
+  configPath: deploy/config
+  sqlPath: deploy/sql

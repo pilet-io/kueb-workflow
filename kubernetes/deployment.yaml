@@ -9,24 +9,24 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: uno-store
+  name: kueb-workflow
   labels:
-    app: uno-store
+    app: kueb-workflow
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      app: uno-store
+      app: kueb-workflow
   template:
     metadata:
       labels:
-        app: uno-store
+        app: kueb-workflow
     spec:
       imagePullSecrets:
         - name: dockersec
       containers:
-        - name: uno-store
-          image: pilet/uno-store:${POM_VERSION}
+        - name: kueb-workflow
+          image: pilet/kueb-workflow:${POM_VERSION}
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -34,42 +34,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: uno-store
+  name: kueb-workflow
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
-    - name: rest
+    - nodePort: 30080
       port: 8080
       targetPort: 8080
   selector:
-    app: uno-store
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: uno-store
-spec:
-  rules:
-    - http:
-        paths:
-          - path: "/v1/store"
-            pathType: Prefix
-            backend:
-              service:
-                name: uno-store
-                port:
-                  number: 8080
-          - path: "/v1/streams"
-            pathType: Prefix
-            backend:
-              service:
-                name: uno-store
-                port:
-                  number: 8080
-          - path: "/v1/iam"
-            pathType: Prefix
-            backend:
-              service:
-                name: uno-store
-                port:
-                  number: 8080
+    app: kueb-workflow

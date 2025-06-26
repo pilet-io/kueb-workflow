@@ -20,7 +20,7 @@ pipeline {
         stage('Deploy') {
             environment {
                 DOCKER_LOGIN = credentials('DOCKER_LOGIN')
-                KUBECONFIG = credentials('KUBECONFIG')
+                KUBECONFIG = credentials('KUBE_WORKFLOW')
             }
             steps {
                 script {
@@ -34,9 +34,9 @@ pipeline {
                         docker build -t pilet/kueb-workflow:$VERSION .
                         docker push pilet/kueb-workflow:$VERSION
 
-                        # cat $KUBECONFIG
-                        # kubectl create ns apps --dry-run=client -o yaml | kubectl apply --kubeconfig $KUBECONFIG -f -
-                        # cat kubernetes/deployment.yaml | POM_VERSION=${VERSION} envsubst | kubectl apply -n apps --kubeconfig $KUBECONFIG -f -
+                        cat $KUBECONFIG
+                        kubectl create ns apps --dry-run=client -o yaml | kubectl apply --kubeconfig $KUBECONFIG -f -
+                        cat kubernetes/deployment.yaml | POM_VERSION=${VERSION} envsubst | kubectl apply -n apps --kubeconfig $KUBECONFIG -f -
                     '''
                 }
             }

@@ -1,4 +1,4 @@
-FROM pilet/java-base
+FROM pilet/java-base:24.21
 ENV PROFILE=cloud
 VOLUME /tmp
 

@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'pilet/jenkins-cicd:1.2'
+            image 'pilet/jenkins-cicd:1.3'
             args '-v /var/run/docker.sock:/var/run/docker.sock -u 0:0'
         }
     }

@@ -3,8 +3,10 @@ package io.pilet.kueb.workflow.actions;
 
 import io.pilet.kueb.common.util.Json;
 import io.pilet.kueb.common.util.Params;
-import io.pilet.kueb.workflow.common.*;
-import io.pilet.kueb.workflow.common.Runtime;
+import io.pilet.kueb.workflow.common.Action;
+import io.pilet.kueb.workflow.common.ActionProcessor;
+import io.pilet.kueb.workflow.common.ActionResult;
+import io.pilet.kueb.workflow.common.Context;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -22,7 +24,7 @@ public class SqlGet implements ActionProcessor, RowMapper<Params> {
         Args args = Json.map(argsJson, Args.class);
         List<String> logs = new LinkedList<>();
         String query = "SELECT row_to_json(t) FROM (SELECT " + args.select() + ") t";
-        Params params = Runtime.jdbcTemplate().queryForObject(query, this);
+        Params params = context.runtime().jdbcTemplate().queryForObject(query, this);
         logs.add("Query : " + args.select());
         logs.add("Data : " + params);
         return new ActionResult(HttpStatus.OK, params, logs);

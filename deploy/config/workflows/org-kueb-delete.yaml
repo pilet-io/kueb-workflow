@@ -5,6 +5,6 @@ args:
   org: required
   name: required
 run:
-- ssh:
-    host: $.args.host
-    command: with lxc delete kueb --org $.args.org --name $.args.name
+  - ssh:
+      host: $.args.host
+      command: with lxc delete kueb --org $.args.org --name $.args.name

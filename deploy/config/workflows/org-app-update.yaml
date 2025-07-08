@@ -1,0 +1,21 @@
+name: org-app-update
+description: On app update
+args:
+  org: required
+  name: required
+  app: required
+run:
+  - log:
+      message: App update org = $.args.org, name = $.args.name, app = $.args.app
+  - sql/get:
+      select: "* from org.kueb where org = '$.args.org' and name = '$.args.name'"
+    as: kueb
+  - ssh:
+      host: $.kueb.host
+      command: with vm create $.args.app --org $.args.org --name $.args.name
+  - sql/update:
+      set:
+        status: DONE
+        attributes: $.ssh
+      in: org.app
+      where: org = '$.args.org' and name = '$.args.name' and app = '$.args.app'

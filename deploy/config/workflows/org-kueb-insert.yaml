@@ -1,0 +1,60 @@
+name: org-kueb-insert
+description: Create kueb entity
+args:
+  org: required
+  name: required
+
+run:
+  - sql/update:
+      set:
+        status: RUNNING
+      in: org.kueb
+      where: org = '$.args.org' and name = '$.args.name'
+  - sql/list:
+      select: host from org.host
+  - random:
+      from: $.sql_list
+      start: 1
+  - log:
+      message: Host is $.random.host
+  - ssh:
+      host: $.random.host
+      command: with lxc create kueb --org $.args.org --name $.args.name
+  - sql/save:
+      insert:
+        org: $.args.org
+        name: $.args.name
+        key: kubeconfig
+        value: $.ssh._file
+      into: org.kueb_attributes
+  - sql/update:
+      set:
+        profile: medium
+        host: $.random.host
+        dns: $.ssh.dns
+        ip4: $.ssh.ip4
+        ip6: $.ssh.ip6
+        status: DONE
+      in: org.kueb
+      where: org = '$.args.org' and name = '$.args.name'
+  - sql/save:
+      insert:
+        dns: $.ssh.name
+        zone: kueb.link
+        cname: $.random.host
+        org: $.args.org
+        name: $.args.name
+        status: REQUESTED
+      into: dns.entry
+  - sql/list:
+      select: app from org.app where org = '$.args.org' and name = '$.args.name' and status = 'REQUESTED'
+  - for:
+      each: app
+      in: $.sql_list
+      run:
+        - sql/update:
+            set:
+              status: RUNNING
+            in: org.app
+            where: org = '$.args.org' and name = '$.args.name' and app = '$.app.app'
+

@@ -74,14 +74,20 @@ public class SshAction implements ActionProcessor {
 
     public static Params extractParams(List<String> console) {
         Params params = new Params();
+        StringBuilder builder = new StringBuilder();
         for(String line : console) {
-            if(line.startsWith("#>")) {
+            if(line.startsWith("!>")) {
                 String[] parts = line.substring(2).split("=");
                 if (parts.length == 2) {
                     params.put(parts[0].strip(), parts[1].strip());
                 }
+            } else if(line.startsWith(">>")) {
+                builder.append(line.substring(2));
+                builder.append("\n");
             }
         }
+        if(!builder.isEmpty())
+            params.put("_file", builder.toString());
         return params;
     }
 

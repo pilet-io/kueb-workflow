@@ -1,4 +1,4 @@
--- DROP SCHEMA IF EXISTS iam CASCADE;
+DROP SCHEMA IF EXISTS iam CASCADE;
 CREATE SCHEMA IF NOT EXISTS iam;
 
 CREATE TABLE IF NOT EXISTS iam.role (
@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS iam.permissions (
 );
 INSERT INTO iam.permissions (url, role, permissions)
 VALUES ('/v1/entity/kuebs', 'power_user', '{GET,POST,PUT,DELETE}'),
+       ('/v1/entity/people', 'power_user', '{GET,POST,PUT,DELETE}'),
+       ('/v1/system/init', 'power_user', '{GET}'),
        ('/v1/workflow/definitions', 'power_user', '{GET,POST,PUT,DELETE}'),
        ('/v1/workflow/runs', 'power_user', '{GET,POST,PUT,DELETE}'),
        ('/v1/iam/users', 'ui_user', '{GET}') ON CONFLICT DO NOTHING;

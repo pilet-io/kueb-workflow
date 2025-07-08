@@ -20,4 +20,9 @@ public record ActionScript (
         return new ActionScript(rawScript.name(), rawScript.description(), rawScript.args(), yaml, items);
     }
 
+    public static ActionScript of(List<Params> run) {
+        List<ActionItem> items = run.stream().map(ActionItem::of).toList();
+        return new ActionScript("for-loop", "", Params.EMPTY, null, items);
+    }
+
 }

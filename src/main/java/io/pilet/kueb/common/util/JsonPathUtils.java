@@ -18,6 +18,20 @@ public class JsonPathUtils {
         return result;
     }
 
+    public static Params render(String json, Map<String,Object> args, String skipKey) {
+        Params result = new Params();
+        for(String key : args.keySet()) {
+            if(skipKey.equals(key)) {
+                result.put(key, args.get(key));
+            } else {
+                Object value = args.get(key);
+                result.put(key, renderObject(json, value));
+            }
+        }
+        return result;
+    }
+
+
     public static Object renderObject(String json, Object value) {
         if(value instanceof String strValue) {
             return render(json, strValue);

@@ -7,5 +7,5 @@ spring:
     bootstrap-servers: kafka-service.kafka:9092
 
 app:
-  configPath: config
-  sqlPath: sql
+  configPath: deploy/config
+  sqlPath: deploy/sql

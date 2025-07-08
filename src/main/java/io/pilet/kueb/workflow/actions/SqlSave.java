@@ -3,8 +3,10 @@ package io.pilet.kueb.workflow.actions;
 
 import io.pilet.kueb.common.util.Json;
 import io.pilet.kueb.common.util.Params;
-import io.pilet.kueb.workflow.common.*;
-import io.pilet.kueb.workflow.common.Runtime;
+import io.pilet.kueb.workflow.common.Action;
+import io.pilet.kueb.workflow.common.ActionProcessor;
+import io.pilet.kueb.workflow.common.ActionResult;
+import io.pilet.kueb.workflow.common.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,7 +30,7 @@ public class SqlSave implements ActionProcessor {
                 .append(" SELECT * FROM json_populate_record(NULL::").append(table)
                 .append(", ?::json)").append(" ON CONFLICT DO NOTHING");
         String query = sql.toString();
-        Runtime.jdbcTemplate().update(query, json);
+        context.runtime().jdbcTemplate().update(query, json);
         logs.add("Query : " + query);
         logs.add("Data : " + json);
         return new ActionResult(HttpStatus.OK, Params.EMPTY, logs);

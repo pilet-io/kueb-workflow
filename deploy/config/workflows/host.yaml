@@ -2,8 +2,11 @@ name: host
 description: Host testing workflow
 run:
 - sql/list:
-    select: host from system.host
-- random:
-    from: $.sql_list
-- log:
-    message: Host is $.random.host
+    select: host from org.host
+  as: hosts
+- for:
+    each: host
+    in: $.hosts
+    run:
+    - log:
+        message: Host is $.host

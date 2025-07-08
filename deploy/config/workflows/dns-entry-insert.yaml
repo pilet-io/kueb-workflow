@@ -1,0 +1,22 @@
+name: dns-entry-insert
+description: Insert dns entry into Cloudflare
+args:
+  org: required
+  name: required
+  dns: required
+  zone: required
+  cname: required
+
+run:
+  - dns/add:
+      dns: $.args.dns
+      zone: $.args.zone
+      cname: $.args.cname
+  - log:
+      message: Dns add returned $.dns_add
+  - sql/update:
+      set:
+        id: $.dns_add.result.id
+        status: DONE
+      in: dns.entry
+      where: org = '$.args.org' and name = '$.args.name'

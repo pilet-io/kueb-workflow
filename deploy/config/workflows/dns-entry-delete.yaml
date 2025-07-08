@@ -1,0 +1,14 @@
+name: dns-entry-delete
+description: Delete dns entry from Cloudflare
+args:
+  id: required
+  dns: required
+  zone: required
+
+run:
+  - dns/delete:
+      id: $.args.id
+      dns: $.args.dns
+      zone: $.args.zone
+  - log:
+      message: Dns delete returned $.dns_delete

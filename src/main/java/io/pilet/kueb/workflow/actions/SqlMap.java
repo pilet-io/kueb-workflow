@@ -2,9 +2,12 @@ package io.pilet.kueb.workflow.actions;
 
 
 import io.pilet.kueb.common.util.Json;
-import io.pilet.kueb.workflow.common.*;
-import io.pilet.kueb.workflow.common.Runtime;
+import io.pilet.kueb.workflow.common.Action;
+import io.pilet.kueb.workflow.common.ActionProcessor;
+import io.pilet.kueb.workflow.common.ActionResult;
+import io.pilet.kueb.workflow.common.Context;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -21,9 +24,10 @@ public class SqlMap implements ActionProcessor, RowMapper<SqlMap.Pair> {
     @Override
     public ActionResult process(Context context, String argsJson) {
         Args args = Json.map(argsJson, Args.class);
+        JdbcTemplate jdbcTemplate = context.runtime().jdbcTemplate();
         List<String> logs = new LinkedList<>();
         String query = "SELECT " + args.select();
-        List<Pair> list = Runtime.jdbcTemplate().query(query, this);
+        List<Pair> list = jdbcTemplate.query(query, this);
         Map<String,Object> map = new LinkedHashMap<>();
         for(Pair pair : list) {
             map.put(pair.key(), pair.value());

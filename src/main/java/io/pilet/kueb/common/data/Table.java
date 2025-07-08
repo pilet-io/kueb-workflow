@@ -11,7 +11,6 @@ public @interface Table {
     String name();
     String pk() default "id";
     String update() default "";
-    boolean async() default false;
     boolean cached() default false;
     String sort() default "";
     int limit() default 1000;

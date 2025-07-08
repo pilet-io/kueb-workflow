@@ -4,8 +4,8 @@ import io.pilet.kueb.common.util.Json;
 import io.pilet.kueb.common.util.Params;
 import io.pilet.kueb.workflow.common.Notification;
 import io.pilet.kueb.workflow.common.NotificationHandler;
-import io.pilet.kueb.workflow.services.RunExecutorService;
 import io.pilet.kueb.workflow.model.RunDetails;
+import io.pilet.kueb.workflow.services.RunExecutorService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +22,7 @@ public class KuebInsert implements NotificationHandler {
     @Override
     public void onMessage(String json) {
         Params args = Json.map(json, Params.class);
-        log.info("KuebInsert message: {}", args);
-        RunDetails runDetails = executorService.execute(args.getString("org"), "org-kueb-insert", args);
-        log.info("KuebInsert result: {}", runDetails);
+        RunDetails runDetails = executorService.async(args.getString("org"), "org-kueb-insert", args);
+        log.info("Kueb Insert: {} {}", args, runDetails);
     }
 }

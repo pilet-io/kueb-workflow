@@ -12,3 +12,7 @@ otel:
       protocol: http/protobuf
       endpoint: http://otel-system.kueb.io
 
+logging:
+  level:
+    org.apache.kafka: WARN
+

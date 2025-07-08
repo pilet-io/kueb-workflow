@@ -1,12 +1,9 @@
 package io.pilet.kueb.common.data;
 
 import io.pilet.kueb.common.util.Json;
-import io.pilet.kueb.workflow.common.EntityEvent;
-import io.pilet.kueb.workflow.common.EntityMethod;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.kafka.core.KafkaTemplate;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,7 +11,6 @@ import java.util.List;
 
 @Log4j2
 public class JdbcStoreDriver<T> implements Store<T>, RowMapper<T> {
-    private final KafkaTemplate<String,String> kafkaTemplate;
     private final JdbcTemplate jdbcTemplate;
     private final Class<T> tClass;
     private final Table table;
@@ -22,10 +18,8 @@ public class JdbcStoreDriver<T> implements Store<T>, RowMapper<T> {
     private final String pk;
     private final String onConflict;
 
-    public JdbcStoreDriver(KafkaTemplate<String, String> kafkaTemplate,
-                           JdbcTemplate jdbcTemplate,
+    public JdbcStoreDriver(JdbcTemplate jdbcTemplate,
                            Class<T> tClass) {
-        this.kafkaTemplate = kafkaTemplate;
         this.jdbcTemplate = jdbcTemplate;
         this.tClass = tClass;
         table = tClass.getAnnotation(Table.class);
@@ -67,10 +61,6 @@ public class JdbcStoreDriver<T> implements Store<T>, RowMapper<T> {
                 ", ?::json)" +
                 onConflict;
         jdbcTemplate.update(sql, json);
-        if(table.async()) {
-            EntityEvent<T> entityEvent = new EntityEvent<>(tableName, EntityMethod.CREATE, data);
-            kafkaTemplate.send("entity.events", Json.of(entityEvent));
-        }
         return data;
     }
 
@@ -78,10 +68,6 @@ public class JdbcStoreDriver<T> implements Store<T>, RowMapper<T> {
     public void delete(String... id) {
         T data = get(id);
         String sql = "DELETE FROM " + tableName + " WHERE " + pk;
-        if(table.async()) {
-            EntityEvent<T> entityEvent = new EntityEvent<>(tableName, EntityMethod.DELETE, data);
-            kafkaTemplate.send("entity.events", Json.of(entityEvent));
-        }
         jdbcTemplate.update(sql, (Object[]) id);
     }
 

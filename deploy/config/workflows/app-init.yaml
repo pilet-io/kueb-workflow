@@ -1,0 +1,11 @@
+name: app-init
+description: Application init script
+args:
+run:
+  - sql/load:
+      folder: deploy/sql
+      files:
+        - iam.sql
+        - org.sql
+        - dns.sql
+  - dns/zone-list:

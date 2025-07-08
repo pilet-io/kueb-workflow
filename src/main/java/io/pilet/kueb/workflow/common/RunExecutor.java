@@ -2,8 +2,6 @@ package io.pilet.kueb.workflow.common;
 
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
-import io.pilet.kueb.common.data.Stores;
 import io.pilet.kueb.common.util.Json;
 import io.pilet.kueb.common.util.JsonPathUtils;
 import io.pilet.kueb.common.util.Params;
@@ -20,19 +18,24 @@ import static io.pilet.kueb.workflow.common.RunStatus.RUNNING;
 public class RunExecutor implements Runnable {
     private static final String DONE_STEP = "done";
     private final ActionScript script;
-    private final Tracer tracer;
+    private final Runtime runtime;
+    private final Context context;
 
-    public RunExecutor(ActionScript script, Tracer tracer) {
+    public RunExecutor(Context context, ActionScript script, Runtime runtime) {
         this.script = script;
-        this.tracer = tracer;
+        this.runtime = runtime;
+        this.context = context;
     }
+
+    public RunExecutor(ActionScript script, Runtime runtime) {
+        this.script = script;
+        this.runtime = runtime;
+        this.context = Context.withArgs(runtime, script.args());
+    }
+
 
     @Override
     public void run() {
-        log.info("Executing script: {} {}",
-                Span.current().getSpanContext().getTraceId(),
-                Span.current().getSpanContext().getSpanId());
-        Context context = Context.withArgs(script.args());
         for(ActionItem item : script.run()) {
             runActionItem(context, item);
         }
@@ -43,7 +46,7 @@ public class RunExecutor implements Runnable {
     @SneakyThrows
     void runActionItem(Context context, ActionItem item) {
         Span span = newSpan(item.name(), item.args());
-        Params args = JsonPathUtils.render(Json.of(context), item.args());
+        Params args = JsonPathUtils.render(Json.of(context), item.args(), "run");
         ActionProcessor processor = item.processorClass().getDeclaredConstructor().newInstance();
         ActionResult result = processor.process(context, Json.of(args));
         context.put(item.name().replace('/', '_'), result.data());
@@ -59,11 +62,11 @@ public class RunExecutor implements Runnable {
         String spanId = span.getSpanContext().getSpanId();
         RunStep step = new RunStep(traceId, spanId, RUNNING, name, args,
                 result.statusCode().value(), result.data(), System.currentTimeMillis());
-        Stores.of(RunStep.class).save(step);
+        runtime.stores().of(RunStep.class).save(step);
         for(int i=0; i<result.logs().size(); i++) {
             String line = result.logs().get(i);
             RunLog log = new RunLog(traceId, spanId, name, i, line);
-            Stores.of(RunLog.class).save(log);
+            runtime.stores().of(RunLog.class).save(log);
         }
     }
 
@@ -73,16 +76,15 @@ public class RunExecutor implements Runnable {
         String spanId = span.getSpanContext().getSpanId();
         RunStep step = new RunStep(traceId, spanId, DONE, DONE_STEP, Params.EMPTY,
                 200, null, System.currentTimeMillis());
-        Stores.of(RunStep.class).save(step);
+        runtime.stores().of(RunStep.class).save(step);
         span.end();
     }
 
 
     Span newSpan(String name, Params params) {
-        Span span = tracer.spanBuilder(name).startSpan();
+        Span span = runtime.tracer().spanBuilder(name).startSpan();
         Attributes attributes = OtelUtils.attributesOf(params);
         span.setAllAttributes(attributes);
-        log.info("Starting span: {}", span);
         return span;
     }
 

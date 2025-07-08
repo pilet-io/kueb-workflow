@@ -7,7 +7,6 @@ import io.pilet.kueb.workflow.common.Action;
 import io.pilet.kueb.workflow.common.ActionProcessor;
 import io.pilet.kueb.workflow.common.ActionResult;
 import io.pilet.kueb.workflow.common.Context;
-import io.pilet.kueb.workflow.common.Runtime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,7 +27,7 @@ public class SqlList implements ActionProcessor, RowMapper<Params> {
         Args args = Json.map(argsJson, Args.class);
         List<String> logs = new LinkedList<>();
         String query = "SELECT row_to_json(t) FROM (SELECT " + args.select() + ") t";
-        List<Params> list = Runtime.jdbcTemplate().query(query, this);
+        List<Params> list = context.runtime().jdbcTemplate().query(query, this);
         logs.add("Query : " + args.select());
         logs.add("Data size : " + list.size());
         return new ActionResult(HttpStatus.OK, list, logs);

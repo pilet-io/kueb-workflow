@@ -1,8 +1,0 @@
-name: test
-description: Testing workflow
-run:
-- sql/map:
-    select: key,value from org.settings
-  as: settings
-- log:
-    message: Root is $.settings.fs_root

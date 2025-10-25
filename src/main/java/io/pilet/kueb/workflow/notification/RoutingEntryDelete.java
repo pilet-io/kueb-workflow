@@ -10,19 +10,19 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 
 @Component
-@Notification("dns_entry_delete")
+@Notification("routing_entry_delete")
 @Log4j2
-public class DnsEntryDelete implements NotificationHandler {
+public class RoutingEntryDelete implements NotificationHandler {
     private final RunExecutorService executorService;
 
-    public DnsEntryDelete(RunExecutorService executorService) {
+    public RoutingEntryDelete(RunExecutorService executorService) {
         this.executorService = executorService;
     }
 
     @Override
     public void onMessage(String json) {
         Params args = Json.map(json, Params.class);
-        RunDetails runDetails = executorService.async(args.getString("org"), "dns-entry-delete", args);
-        log.info("Dns Delete Run : {}", runDetails);
+        RunDetails runDetails = executorService.async(args.getString("org"), "routing-entry-delete", args);
+        log.info("Route Delete Run : {}", runDetails);
     }
 }

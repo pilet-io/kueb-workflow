@@ -1,4 +1,4 @@
-name: dns-entry-delete
+name: routing-entry-delete
 description: Delete dns entry from Cloudflare
 args:
   id: required

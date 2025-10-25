@@ -3,8 +3,12 @@ description: Create kueb entity
 args:
   org: required
   name: required
+  profile: required
 
 run:
+  - sql/get:
+      select: org,zone from iam.org where org = '$.args.org'
+    as: org
   - sql/update:
       set:
         status: RUNNING
@@ -14,7 +18,8 @@ run:
       select: host from org.host
   - random:
       from: $.sql_list
-      start: 1
+      #start: 2
+      fixed: 2
   - log:
       message: Host is $.random.host
   - ssh:
@@ -29,7 +34,8 @@ run:
       into: org.kueb_attributes
   - sql/update:
       set:
-        profile: medium
+        product: kueb-$.args.profile
+        profile: $.args.profile
         host: $.random.host
         dns: $.ssh.dns
         ip4: $.ssh.ip4
@@ -37,15 +43,40 @@ run:
         status: DONE
       in: org.kueb
       where: org = '$.args.org' and name = '$.args.name'
+
   - sql/save:
       insert:
-        dns: $.ssh.name
-        zone: kueb.link
-        cname: $.random.host
         org: $.args.org
         name: $.args.name
-        status: REQUESTED
-      into: dns.entry
+        dns: $.ssh.name
+        zone: $.org.zone
+        cname: $.random.host
+      into: routing.entry
+  - sql/save:
+      insert:
+        org: $.args.org
+        name: $.args.name
+        host: $.random.host
+        entry: https
+        ip4: $.ssh.ip4
+        port: 80
+        tls: zone
+        dns: $.ssh.name
+        zone: $.org.zone
+      into: routing.route
+  - sql/save:
+      insert:
+        org: $.args.org
+        name: $.args.name
+        host: $.random.host
+        entry: k8s
+        ip4: $.ssh.ip4
+        port: 6443
+        tls: pass
+        dns: $.ssh.name
+        zone: $.org.zone
+      into: routing.route
+
   - sql/list:
       select: app from org.app where org = '$.args.org' and name = '$.args.name' and status = 'REQUESTED'
   - for:
@@ -57,4 +88,3 @@ run:
               status: RUNNING
             in: org.app
             where: org = '$.args.org' and name = '$.args.name' and app = '$.app.app'
-

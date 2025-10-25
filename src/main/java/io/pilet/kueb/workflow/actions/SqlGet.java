@@ -7,6 +7,7 @@ import io.pilet.kueb.workflow.common.Action;
 import io.pilet.kueb.workflow.common.ActionProcessor;
 import io.pilet.kueb.workflow.common.ActionResult;
 import io.pilet.kueb.workflow.common.Context;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -15,7 +16,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-
+@Log4j2
 @Action(name = "sql/get", description = "Select a single row from a table", params = {"select"})
 public class SqlGet implements ActionProcessor, RowMapper<Params> {
 
@@ -24,6 +25,7 @@ public class SqlGet implements ActionProcessor, RowMapper<Params> {
         Args args = Json.map(argsJson, Args.class);
         List<String> logs = new LinkedList<>();
         String query = "SELECT row_to_json(t) FROM (SELECT " + args.select() + ") t";
+        log.info("Sql Get : {}", query);
         Params params = context.runtime().jdbcTemplate().queryForObject(query, this);
         logs.add("Query : " + args.select());
         logs.add("Data : " + params);

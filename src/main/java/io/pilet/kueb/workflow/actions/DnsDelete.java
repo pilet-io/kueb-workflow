@@ -31,7 +31,8 @@ public class DnsDelete implements ActionProcessor {
         log.info("DnsDelete, dnsZone : {}", dnsZone);
         String url = "https://api.cloudflare.com/client/v4/zones/" + dnsZone.id() + "/dns_records/" + args.id();
         logs.add("DnsDelete url: " + url);
-        try (HttpClient client = HttpClient.newBuilder().build()) {
+        HttpClient client = HttpClient.newBuilder().build();
+        try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Content-Type", "application/json")

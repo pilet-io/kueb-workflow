@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 
-@Action(name = "random", description = "Random pick from an array", params = {"from,start"})
+@Action(name = "random", description = "Random pick from an array", params = {"from,start,fixed"})
 public class RandomAction implements ActionProcessor {
 
     @Override
@@ -22,15 +22,17 @@ public class RandomAction implements ActionProcessor {
         List<String> logs = new LinkedList<>();
         Random random = new Random();
         int start = args.start();
-        int index = random.nextInt(args.from().length - start) + start;
-        Object data = args.from()[index];
+        int fixed = args.fixed();
+        int index = (fixed != 0)? fixed : random.nextInt(args.from().length - start) + start + 1;
+        Object data = args.from()[index - 1];
         logs.add("Picked " + index + " : " + data);
         return new ActionResult(HttpStatus.OK, data, logs);
     }
 
     record Args (
             Object[] from,
-            int start
+            int start,
+            int fixed
     ) {
     }
 }

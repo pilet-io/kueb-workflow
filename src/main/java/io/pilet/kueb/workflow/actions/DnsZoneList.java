@@ -29,7 +29,8 @@ public class DnsZoneList implements ActionProcessor {
         List<String> logs = new LinkedList<>();
         String dnsPassword = System.getenv().getOrDefault("DNS_PASSWORD", "");
         log.info("dns/zone-list with password : {}", dnsPassword);
-        try (HttpClient client = HttpClient.newBuilder().build()) {
+        HttpClient client = HttpClient.newBuilder().build();
+        try {
             HttpRequest request = HttpRequest.newBuilder().GET()
                     .uri(URI.create("https://api.cloudflare.com/client/v4/zones"))
                     .header("Content-Type", "application/json")

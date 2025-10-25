@@ -5,7 +5,9 @@ run:
   - sql/load:
       folder: deploy/sql
       files:
+        - fn.sql
         - iam.sql
+        - billing.sql
         - org.sql
-        - dns.sql
+        - routing.sql
   - dns/zone-list:

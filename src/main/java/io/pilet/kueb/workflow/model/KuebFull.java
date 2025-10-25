@@ -7,10 +7,12 @@ import io.pilet.kueb.workflow.common.RunStatus;
 import java.util.ArrayList;
 import java.util.List;
 
-@Table(name = "org.view_kueb_full", pk = "org,name")
+@Table(name = "org.view_kueb_full")
 public record KuebFull (
+        String id,
         String org,
         String name,
+        String product,
         String profile,
         RunStatus status,
         String host,
@@ -20,6 +22,9 @@ public record KuebFull (
         List<App> apps,
         Params attributes
 ) {
+    public String product() {
+        return product == null ? "kueb-medium" : product;
+    }
     public String profile() {
         return profile == null ? "medium" : profile;
     }
@@ -36,7 +41,7 @@ public record KuebFull (
                 appList.add(newApp);
             }
         }
-        return new KuebFull(org, name, "medium", RunStatus.REQUESTED,
+        return new KuebFull(Kueb.id(org,name), org, name, "kueb-medium", "medium", RunStatus.REQUESTED,
                 null, null, null, null, appList, Params.EMPTY);
     }
 }

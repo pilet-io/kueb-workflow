@@ -26,24 +26,24 @@ VALUES ('fs_root', 'system', '/')
 ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS org.kueb (
+    id TEXT PRIMARY KEY,
     org TEXT REFERENCES iam.org ON DELETE CASCADE,
     name TEXT,
     profile TEXT,
+    product TEXT REFERENCES billing.product,
     status TEXT,
     host TEXT REFERENCES org.host,
     dns TEXT,
     ip4 TEXT,
-    ip6 TEXT,
-    PRIMARY KEY (org, name)
+    ip6 TEXT
 );
 
 CREATE TABLE IF NOT EXISTS org.kueb_attributes (
-    org TEXT,
+    kueb_id TEXT REFERENCES org.kueb ON DELETE CASCADE,
     name TEXT,
     key TEXT,
     value TEXT,
-    FOREIGN KEY (org, name) REFERENCES org.kueb (org, name) ON DELETE CASCADE,
-    PRIMARY KEY (org, name, key)
+    PRIMARY KEY (kueb_id, key)
 );
 
 CREATE TABLE IF NOT EXISTS org.app_version (
@@ -59,41 +59,42 @@ VALUES ('postgres', '17.5.0', 'Y'),
        ('redis', '8.0.2', 'Y');
 
 CREATE TABLE IF NOT EXISTS org.app (
-    org TEXT,
-    name TEXT,
+    id TEXT PRIMARY KEY,
+    kueb_id TEXT REFERENCES org.kueb ON DELETE CASCADE,
     app TEXT,
     version TEXT,
     status TEXT,
     attributes JSON,
-    PRIMARY KEY (org, name, app),
-    FOREIGN KEY (org, name) REFERENCES org.kueb (org, name) ON DELETE CASCADE,
     FOREIGN KEY (app, version) REFERENCES org.app_version (app, version)
 );
 
 
 CREATE OR REPLACE VIEW org.view_apps_consolidated AS
-SELECT org, name, json_agg(app.*) AS apps
+SELECT kueb_id, json_agg(app.*) AS apps
 FROM org.app
-GROUP BY org, name;
+GROUP BY kueb_id;
 
 CREATE OR REPLACE VIEW org.view_kueb_attributes AS
-SELECT org, name, json_object_agg(key,value) AS attributes
+SELECT kueb_id, json_object_agg(key,value) AS attributes
 FROM org.kueb_attributes
-GROUP BY org, name;
+GROUP BY kueb_id;
 
 
 CREATE OR REPLACE VIEW org.view_kueb_full AS
-    SELECT kueb.org, kueb.name, kueb.profile, kueb.status, kueb.host, kueb.dns, kueb.ip4, kueb.ip6,
+    SELECT kueb.id, kueb.org, kueb.name, kueb.profile, kueb.status, kueb.host, kueb.dns, kueb.ip4, kueb.ip6,
            a.apps, b.attributes
     FROM org.kueb
-    LEFT JOIN org.view_apps_consolidated a ON kueb.org = a.org AND kueb.name = a.name
-    LEFT JOIN org.view_kueb_attributes b ON kueb.org = b.org AND kueb.name = b.name;
-
+    LEFT JOIN org.view_apps_consolidated a ON kueb.id = a.kueb_id
+    LEFT JOIN org.view_kueb_attributes b ON kueb.id = a.kueb_id;
 
 
 
 CREATE OR REPLACE TRIGGER kueb_notification_trigger
 AFTER INSERT OR UPDATE OR DELETE ON org.kueb FOR EACH ROW EXECUTE PROCEDURE fn.send_notification();
+
+
+CREATE OR REPLACE TRIGGER billing_kueb_created_trigger
+AFTER UPDATE ON org.kueb FOR EACH ROW EXECUTE PROCEDURE billing.kueb_created();
 
 CREATE OR REPLACE TRIGGER app_notification_trigger
 AFTER INSERT OR UPDATE OR DELETE ON org.app FOR EACH ROW EXECUTE PROCEDURE fn.send_notification();

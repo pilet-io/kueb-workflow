@@ -26,3 +26,13 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn.status_requested() RETURNS TRIGGER as $$
+BEGIN
+    IF NEW.status is null THEN
+        NEW.status = 'REQUESTED';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;

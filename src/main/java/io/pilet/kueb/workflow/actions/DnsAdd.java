@@ -34,7 +34,8 @@ public class DnsAdd implements ActionProcessor {
         CloudflareEntry entry = new CloudflareEntry("CNAME",
                 args.dns() + "." + args.zone(), args.cname(), false);
         logs.add("DnsAdd request: " + entry);
-        try (HttpClient client = HttpClient.newBuilder().build()) {
+        HttpClient client = HttpClient.newBuilder().build();
+        try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
                     .header("Content-Type", "application/json")

@@ -1,0 +1,19 @@
+name: routing-route-delete
+description: Delete routing route info
+args:
+  org: required
+  name: required
+  host: required
+  entry: required
+  ip4: required
+  port: required
+  tls: required
+  dns: required
+  zone: required
+
+run:
+  - ssh:
+      host: $.args.host
+      command: with lxc delete route-$.args.tls --org $.args.org --name $.args.name --entry $.args.entry --zone $.args.zone --ip4 $.args.ip4 --port $.args.port
+  - log:
+      message: Ssh lxc delete route-$.args.entry returned $.ssh

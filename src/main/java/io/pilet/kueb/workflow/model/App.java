@@ -5,10 +5,10 @@ import io.pilet.kueb.common.util.Params;
 import io.pilet.kueb.workflow.common.AppVersions;
 import io.pilet.kueb.workflow.common.RunStatus;
 
-@Table(name = "org.app", pk = "org,name,app")
+@Table(name = "org.app")
 public record App (
-        String org,
-        String name,
+        String id,
+        String kuebId,
         String app,
         String version,
         RunStatus status,

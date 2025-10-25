@@ -2,7 +2,7 @@ spring:
   jackson:
     default-property-inclusion: non_null
   profiles:
-    active: cloud
+    active: dev
   application:
     name: kueb-worklfow
 

@@ -36,11 +36,12 @@ public class SqlUpdate implements ActionProcessor {
     }
 
     String value(Object object) {
-        return switch(object) {
-            case String s -> "'" + object + "'";
-            case Map m -> "'" + Json.of(object) + "'";
-            default -> object.toString();
-        };
+        if (object instanceof String) {
+            return "'" + object + "'";
+        } else if (object instanceof Map) {
+            return "'" + Json.of(object) + "'";
+        } else
+            return object.toString();
     }
 
     record Args (

@@ -1,4 +1,4 @@
-name: dns-entry-insert
+name: routing-entry-insert
 description: Insert dns entry into Cloudflare
 args:
   org: required
@@ -18,5 +18,5 @@ run:
       set:
         id: $.dns_add.result.id
         status: DONE
-      in: dns.entry
+      in: routing.entry
       where: org = '$.args.org' and name = '$.args.name'

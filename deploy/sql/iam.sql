@@ -21,9 +21,11 @@ VALUES ('/v1/entity/kuebs', 'power_user', '{GET,POST,PUT,DELETE}'),
        ('/v1/iam/users', 'ui_user', '{GET}') ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS iam.org (
-    org TEXT PRIMARY KEY
+    org TEXT PRIMARY KEY,
+    zone TEXT
 );
-INSERT INTO iam.org (org) VALUES ('pilet'), ('system') ON CONFLICT DO NOTHING;
+INSERT INTO iam.org (org, zone)
+    VALUES ('pilet', 'kueb.link'), ('system', 'kueb.io') ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS iam.users (
     email TEXT PRIMARY KEY,
